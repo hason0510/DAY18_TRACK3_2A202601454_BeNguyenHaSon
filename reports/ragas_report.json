@@ -1,0 +1,221 @@
+{
+  "aggregate": {
+    "faithfulness": 0.8414,
+    "answer_relevancy": 0.8597,
+    "context_precision": 0.8958,
+    "context_recall": 0.95
+  },
+  "num_questions": 20,
+  "failures": [
+    {
+      "question": "Nhân viên tạm ứng 15 triệu, sau 20 ngày mới thanh toán. Bị phạt bao nhiêu?",
+      "worst_metric": "faithfulness",
+      "score": 0.7117,
+      "worst_score": 0.1111,
+      "metric_scores": {
+        "faithfulness": 0.1111,
+        "answer_relevancy": 0.9022,
+        "context_precision": 0.8333,
+        "context_recall": 1.0
+      },
+      "diagnosis": "LLM hallucinating — answer chứa thông tin không có trong context",
+      "suggested_fix": "Siết prompt ('CHỈ dùng context, không suy luận'), temperature=0, yêu cầu trích dẫn nguồn cho từng câu",
+      "answer": "Nhân viên tạm ứng 15 triệu VNĐ và thanh toán sau 20 ngày sẽ bị phạt 2%/tháng trên số tiền chưa hoàn ứng. Thời gian quá hạn là 5 ngày (20 ngày - 15 ngày), tương đương với 1/6 tháng. Do đó, mức phạt sẽ được tính như sau: 2% × 15.000.000 VNĐ × (1/6) = 500.000 VNĐ. Như vậy, nhân viên sẽ bị phạt 500.000 ",
+      "ground_truth": "Thời hạn thanh toán là 15 ngày. Quá hạn 5 ngày, bị tính phí 2%/tháng trên 15.000.000 VNĐ = 300.000 VNĐ/tháng (tính pro-rata khoảng 50.000 VNĐ cho 5 ngày).",
+      "contexts_preview": [
+        "[Nguồn: tam_ung.md]\n# Chính sách tạm ứng\n> Phiên bản: 1.0 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Tài chính\n\n## Hạn mức tạm ứng\nNhân viên có thể tạm ứng tối đa **20.000.000 VNĐ** cho mỗi lần đề xuất.",
+        "[Nguồn: nghi_phep_nam_v2024.md]\n# Chính sách nghỉ phép năm (Phiên bản 2024)\n> Phiên bản: 2.0 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Nhân sự\n\n## Số ngày phép năm\nMỗi nhân viên chính thức được hưởng *",
+        "[Nguồn: chi_phi_expense.md]\n# Quy trình chi phí và hoàn ứng\n> Phiên bản: 1.3 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Tài chính\n\n## Thời hạn nộp hồ sơ\nNhân viên phải nộp hồ sơ hoàn ứng chi phí trong v"
+      ]
+    },
+    {
+      "question": "Lương thử việc của nhân viên Junior mức cao nhất là bao nhiêu?",
+      "worst_metric": "faithfulness",
+      "score": 0.7236,
+      "worst_score": 0.0,
+      "metric_scores": {
+        "faithfulness": 0.0,
+        "answer_relevancy": 0.8945,
+        "context_precision": 1.0,
+        "context_recall": 1.0
+      },
+      "diagnosis": "LLM hallucinating — answer chứa thông tin không có trong context",
+      "suggested_fix": "Siết prompt ('CHỈ dùng context, không suy luận'), temperature=0, yêu cầu trích dẫn nguồn cho từng câu",
+      "answer": "Lương thử việc của nhân viên Junior mức cao nhất là 17.000.000 VNĐ. Cách tính là 85% × 20.000.000 VNĐ = 17.000.000 VNĐ.",
+      "ground_truth": "Junior cao nhất là 20.000.000 VNĐ/tháng. Lương thử việc = 85% x 20.000.000 = 17.000.000 VNĐ/tháng.",
+      "contexts_preview": [
+        "[Nguồn: thu_viec.md]\n# Chính sách thử việc\n> Phiên bản: 1.2 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Nhân sự\n\n## Thời gian thử việc\nThời gian thử việc tiêu chuẩn là **60 ngày** kể từ ngày bắt đầu làm ",
+        "[Nguồn: bang_luong_2024.md]\n# Bảng lương năm 2024\n> Phiên bản: 3.0 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Nhân sự & Tài chính\n\n## Khung lương theo cấp bậc\n| Cấp bậc | Lương gross (VNĐ/tháng) |\n|----",
+        "[Nguồn: tam_ung.md]\n# Chính sách tạm ứng\n> Phiên bản: 1.0 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Tài chính\n\n## Hạn mức tạm ứng\nNhân viên có thể tạm ứng tối đa **20.000.000 VNĐ** cho mỗi lần đề xuất."
+      ]
+    },
+    {
+      "question": "Có cần kích hoạt xác thực đa yếu tố (MFA) không?",
+      "worst_metric": "context_recall",
+      "score": 0.7578,
+      "worst_score": 0.5,
+      "metric_scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.5313,
+        "context_precision": 1.0,
+        "context_recall": 0.5
+      },
+      "diagnosis": "Retrieval thiếu chunk chứa thông tin của ground_truth",
+      "suggested_fix": "Tăng top_k, dùng hybrid BM25+Dense, chunk lớn hơn hoặc parent-child, enrichment (contextual prepend / HyQA) để bắc cầu vocabulary gap",
+      "answer": "Có, tất cả nhân viên bắt buộc phải kích hoạt xác thực đa yếu tố (MFA) cho tài khoản email, VPN và các hệ thống nội bộ.",
+      "ground_truth": "Có, theo chính sách mật khẩu v2.0 hiện hành, tất cả nhân viên bắt buộc kích hoạt MFA cho email, VPN và hệ thống nội bộ. Chính sách cũ v1.0 không yêu cầu MFA.",
+      "contexts_preview": [
+        "[Nguồn: mat_khau_v2.md]\n# Chính sách mật khẩu (Phiên bản hiện hành)\n> Phiên bản: 2.0 | Ngày hiệu lực: 01/07/2024 | Phòng ban: CNTT\n\n## Yêu cầu mật khẩu\nMật khẩu phải có tối thiểu **12 ký tự**, bao gồm",
+        "[Nguồn: mua_sam.md]\n# Quy trình mua sắm\n> Phiên bản: 2.2 | Ngày hiệu lực: 01/04/2024 | Phòng ban: Hành chính & Tài chính\n\n## Thẩm quyền phê duyệt\n| Giá trị đơn hàng | Người phê duyệt |\n|--------------",
+        "[Nguồn: vpn_truy_cap.md]\n# Chính sách VPN và truy cập từ xa\n> Phiên bản: 1.3 | Ngày hiệu lực: 01/04/2024 | Phòng ban: CNTT\n\n## Giao thức kết nối\nCông ty sử dụng **WireGuard VPN** với mã hóa **AES-256*"
+      ]
+    },
+    {
+      "question": "Một nhân viên Senior có 9 năm thâm niên được nghỉ bao nhiêu ngày phép năm và lương trong khoảng nào?",
+      "worst_metric": "context_recall",
+      "score": 0.7647,
+      "worst_score": 0.5,
+      "metric_scores": {
+        "faithfulness": 0.8,
+        "answer_relevancy": 0.7588,
+        "context_precision": 1.0,
+        "context_recall": 0.5
+      },
+      "diagnosis": "Retrieval thiếu chunk chứa thông tin của ground_truth",
+      "suggested_fix": "Tăng top_k, dùng hybrid BM25+Dense, chunk lớn hơn hoặc parent-child, enrichment (contextual prepend / HyQA) để bắc cầu vocabulary gap",
+      "answer": "Nhân viên Senior có 9 năm thâm niên được nghỉ 18 ngày phép năm, tính theo quy định là 15 ngày phép cơ bản cộng thêm 3 ngày phép cho 9 năm thâm niên (1 ngày cho mỗi 3 năm). Lương trong khoảng này sẽ được hưởng đầy đủ trong thời gian nghỉ phép.",
+      "ground_truth": "Theo chính sách v2024: 15 ngày cơ bản + 3 ngày thâm niên (9÷3=3) = 18 ngày phép. Lương Senior (P3-P4): 20-35 triệu VNĐ/tháng.",
+      "contexts_preview": [
+        "[Nguồn: nghi_phep_nam_v2024.md]\n# Chính sách nghỉ phép năm (Phiên bản 2024)\n> Phiên bản: 2.0 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Nhân sự\n\n## Số ngày phép năm\nMỗi nhân viên chính thức được hưởng *",
+        "[Nguồn: nghi_phep_nam_v2023.md]\n# Chính sách nghỉ phép năm (Phiên bản 2023)\n> Phiên bản: 1.0 | Ngày hiệu lực: 01/01/2023 | Phòng ban: Nhân sự\n\n## Số ngày phép năm\nMỗi nhân viên chính thức được hưởng *",
+        "[Nguồn: nghi_phep_khong_luong.md]\n# Chính sách nghỉ phép không lương\n> Phiên bản: 1.2 | Ngày hiệu lực: 01/07/2023 | Phòng ban: Nhân sự\n\n## Điều kiện áp dụng\nNhân viên chính thức đã hết phép năm có thể"
+      ]
+    },
+    {
+      "question": "Nhân viên được tài trợ khóa học 25 triệu, nghỉ việc sau 8 tháng hoàn thành khóa học. Phải hoàn trả bao nhiêu?",
+      "worst_metric": "faithfulness",
+      "score": 0.7705,
+      "worst_score": 0.25,
+      "metric_scores": {
+        "faithfulness": 0.25,
+        "answer_relevancy": 0.8318,
+        "context_precision": 1.0,
+        "context_recall": 1.0
+      },
+      "diagnosis": "LLM hallucinating — answer chứa thông tin không có trong context",
+      "suggested_fix": "Siết prompt ('CHỈ dùng context, không suy luận'), temperature=0, yêu cầu trích dẫn nguồn cho từng câu",
+      "answer": "Nhân viên được tài trợ khóa học 25 triệu VNĐ và nghỉ việc sau 8 tháng hoàn thành khóa học phải hoàn trả 100% chi phí đào tạo đã được tài trợ. Do đó, số tiền phải hoàn trả là 25.000.000 VNĐ.",
+      "ground_truth": "Nhân viên phải cam kết làm việc ít nhất 1 năm sau khi hoàn thành khóa học. Nghỉ sau 8 tháng là trước hạn cam kết, phải hoàn trả 100% chi phí tức 25.000.000 VNĐ.",
+      "contexts_preview": [
+        "[Nguồn: hoan_chi_dao_tao.md]\n# Chính sách hoàn chi đào tạo\n> Phiên bản: 1.1 | Ngày hiệu lực: 01/07/2023 | Phòng ban: Nhân sự & Tài chính\n\n## Điều kiện được tài trợ\nCông ty chi trả chi phí đào tạo bên ",
+        "[Nguồn: dao_tao_noi_bo.md]\n# Chính sách đào tạo nội bộ\n> Phiên bản: 1.3 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Nhân sự & Đào tạo\n\n## Yêu cầu đào tạo\nMỗi phòng ban phải tổ chức tối thiểu **2 buổi đào",
+        "[Nguồn: chi_phi_expense.md]\n# Quy trình chi phí và hoàn ứng\n> Phiên bản: 1.3 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Tài chính\n\n## Thời hạn nộp hồ sơ\nNhân viên phải nộp hồ sơ hoàn ứng chi phí trong v"
+      ]
+    },
+    {
+      "question": "Nhân viên được nghỉ bao nhiêu ngày phép năm?",
+      "worst_metric": "context_precision",
+      "score": 0.8073,
+      "worst_score": 0.5,
+      "metric_scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.7293,
+        "context_precision": 0.5,
+        "context_recall": 1.0
+      },
+      "diagnosis": "Context lấy về nhiều đoạn nhiễu, đoạn đúng không nằm ở top",
+      "suggested_fix": "Bật/tăng cường reranking (cross-encoder), giảm top_k, thêm metadata filter theo category/version",
+      "answer": "Nhân viên được nghỉ **15 ngày phép năm** có lương. Chính sách này được áp dụng theo phiên bản 2024, thay thế hoàn toàn phiên bản 2023.",
+      "ground_truth": "Theo chính sách hiện hành (v2024), nhân viên được nghỉ 15 ngày phép năm có lương. Chính sách cũ (v2023) là 12 ngày nhưng đã bị thay thế.",
+      "contexts_preview": [
+        "[Nguồn: nghi_phep_nam_v2023.md]\n# Chính sách nghỉ phép năm (Phiên bản 2023)\n> Phiên bản: 1.0 | Ngày hiệu lực: 01/01/2023 | Phòng ban: Nhân sự\n\n## Số ngày phép năm\nMỗi nhân viên chính thức được hưởng *",
+        "[Nguồn: nghi_phep_nam_v2024.md]\n# Chính sách nghỉ phép năm (Phiên bản 2024)\n> Phiên bản: 2.0 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Nhân sự\n\n## Số ngày phép năm\nMỗi nhân viên chính thức được hưởng *",
+        "[Nguồn: nghi_phep_dac_biet.md]\n# Chính sách nghỉ phép đặc biệt\n> Phiên bản: 1.1 | Ngày hiệu lực: 01/03/2024 | Phòng ban: Nhân sự\n\n## Các trường hợp được nghỉ phép đặc biệt\nNhân viên được nghỉ có lương"
+      ]
+    },
+    {
+      "question": "Thâm niên bao nhiêu năm thì được cộng thêm ngày phép?",
+      "worst_metric": "context_precision",
+      "score": 0.8172,
+      "worst_score": 0.5,
+      "metric_scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.7687,
+        "context_precision": 0.5,
+        "context_recall": 1.0
+      },
+      "diagnosis": "Context lấy về nhiều đoạn nhiễu, đoạn đúng không nằm ở top",
+      "suggested_fix": "Bật/tăng cường reranking (cross-encoder), giảm top_k, thêm metadata filter theo category/version",
+      "answer": "Thâm niên từ 3 năm trở lên thì nhân viên được cộng thêm 1 ngày phép cho mỗi 3 năm làm việc liên tục. Quy định này áp dụng theo chính sách nghỉ phép năm phiên bản 2024.",
+      "ground_truth": "Theo chính sách v2024 hiện hành, nhân viên có thâm niên từ 3 năm trở lên được cộng thêm 1 ngày phép cho mỗi 3 năm. Chính sách cũ v2023 yêu cầu 5 năm.",
+      "contexts_preview": [
+        "[Nguồn: nghi_phep_nam_v2023.md]\n# Chính sách nghỉ phép năm (Phiên bản 2023)\n> Phiên bản: 1.0 | Ngày hiệu lực: 01/01/2023 | Phòng ban: Nhân sự\n\n## Số ngày phép năm\nMỗi nhân viên chính thức được hưởng *",
+        "[Nguồn: nghi_phep_nam_v2024.md]\n# Chính sách nghỉ phép năm (Phiên bản 2024)\n> Phiên bản: 2.0 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Nhân sự\n\n## Số ngày phép năm\nMỗi nhân viên chính thức được hưởng *",
+        "[Nguồn: nghi_phep_khong_luong.md]\n# Chính sách nghỉ phép không lương\n> Phiên bản: 1.2 | Ngày hiệu lực: 01/07/2023 | Phòng ban: Nhân sự\n\n## Điều kiện áp dụng\nNhân viên chính thức đã hết phép năm có thể"
+      ]
+    },
+    {
+      "question": "Nếu cần mua một chiếc laptop 30 triệu cho nhân viên mới, ai phê duyệt và cần gì từ phòng CNTT?",
+      "worst_metric": "faithfulness",
+      "score": 0.8721,
+      "worst_score": 0.6667,
+      "metric_scores": {
+        "faithfulness": 0.6667,
+        "answer_relevancy": 0.8215,
+        "context_precision": 1.0,
+        "context_recall": 1.0
+      },
+      "diagnosis": "LLM hallucinating — answer chứa thông tin không có trong context",
+      "suggested_fix": "Siết prompt ('CHỈ dùng context, không suy luận'), temperature=0, yêu cầu trích dẫn nguồn cho từng câu",
+      "answer": "Đối với việc mua một chiếc laptop 30 triệu VNĐ cho nhân viên mới, Giám đốc phòng ban sẽ là người phê duyệt vì giá trị đơn hàng nằm trong khoảng từ 5.000.000 VNĐ đến 50.000.000 VNĐ. Ngoài ra, cần có xác nhận của phòng CNTT về cấu hình kỹ thuật trước khi đề xuất mua sắm.",
+      "ground_truth": "Laptop 30 triệu nằm trong khoảng 5-50 triệu nên cần Giám đốc phòng ban (Director) phê duyệt. Ngoài ra, mua sắm thiết bị CNTT cần có xác nhận cấu hình kỹ thuật từ phòng CNTT trước khi đề xuất. Cần đính kèm ít nhất 3 báo giá vì trên 10 triệu.",
+      "contexts_preview": [
+        "[Nguồn: mua_sam.md]\n# Quy trình mua sắm\n> Phiên bản: 2.2 | Ngày hiệu lực: 01/04/2024 | Phòng ban: Hành chính & Tài chính\n\n## Thẩm quyền phê duyệt\n| Giá trị đơn hàng | Người phê duyệt |\n|--------------",
+        "[Nguồn: tam_ung.md]\n# Chính sách tạm ứng\n> Phiên bản: 1.0 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Tài chính\n\n## Hạn mức tạm ứng\nNhân viên có thể tạm ứng tối đa **20.000.000 VNĐ** cho mỗi lần đề xuất.",
+        "[Nguồn: hoan_chi_dao_tao.md]\n# Chính sách hoàn chi đào tạo\n> Phiên bản: 1.1 | Ngày hiệu lực: 01/07/2023 | Phòng ban: Nhân sự & Tài chính\n\n## Điều kiện được tài trợ\nCông ty chi trả chi phí đào tạo bên "
+      ]
+    },
+    {
+      "question": "Thông tin lương thuộc cấp độ phân loại dữ liệu nào?",
+      "worst_metric": "answer_relevancy",
+      "score": 0.8758,
+      "worst_score": 0.5031,
+      "metric_scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.5031,
+        "context_precision": 1.0,
+        "context_recall": 1.0
+      },
+      "diagnosis": "Answer không trả lời đúng trọng tâm câu hỏi (lạc đề hoặc lan man)",
+      "suggested_fix": "Sửa prompt template: trả lời trực tiếp, ngắn gọn, bám đúng dạng câu hỏi (số liệu → trả số liệu)",
+      "answer": "Thông tin lương thuộc cấp độ phân loại dữ liệu là **Bí mật**. Theo quy định, dữ liệu này cấm chia sẻ với đồng nghiệp và cần mã hóa khi truyền.",
+      "ground_truth": "Theo quy chế chi trả lương, thông tin lương được phân loại là dữ liệu Bí mật, cấm chia sẻ với đồng nghiệp. Theo chính sách phân loại dữ liệu, dữ liệu Bí mật (cấp 3) phải mã hóa khi truyền và hạn chế truy cập theo need-to-know.",
+      "contexts_preview": [
+        "[Nguồn: phan_loai_du_lieu.md]\n# Chính sách phân loại dữ liệu\n> Phiên bản: 1.0 | Ngày hiệu lực: 01/06/2024 | Phòng ban: CNTT & An ninh thông tin\n\n## Bốn cấp độ phân loại\n| Cấp độ | Nhãn | Ví dụ |\n|----",
+        "[Nguồn: ky_luong.md]\n# Quy chế chi trả lương\n> Phiên bản: 1.1 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Tài chính & Nhân sự\n\n## Ngày chi trả\nLương tháng được chi trả vào **ngày mùng 5** hàng tháng. Nếu",
+        "[Nguồn: bang_luong_2024.md]\n# Bảng lương năm 2024\n> Phiên bản: 3.0 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Nhân sự & Tài chính\n\n## Khung lương theo cấp bậc\n| Cấp bậc | Lương gross (VNĐ/tháng) |\n|----"
+      ]
+    },
+    {
+      "question": "Muốn mua thiết bị trị giá 55 triệu cần ai phê duyệt?",
+      "worst_metric": "context_precision",
+      "score": 0.9111,
+      "worst_score": 0.75,
+      "metric_scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.8945,
+        "context_precision": 0.75,
+        "context_recall": 1.0
+      },
+      "diagnosis": "Context lấy về nhiều đoạn nhiễu, đoạn đúng không nằm ở top",
+      "suggested_fix": "Bật/tăng cường reranking (cross-encoder), giảm top_k, thêm metadata filter theo category/version",
+      "answer": "Để mua thiết bị trị giá 55 triệu VNĐ, cần có phê duyệt của Tổng Giám đốc (CEO) vì giá trị đơn hàng này nằm trên 50 triệu VNĐ.",
+      "ground_truth": "Đơn hàng trên 50.000.000 VNĐ cần Tổng Giám đốc (CEO) phê duyệt.",
+      "contexts_preview": [
+        "[Nguồn: mua_sam.md]\n# Quy trình mua sắm\n> Phiên bản: 2.2 | Ngày hiệu lực: 01/04/2024 | Phòng ban: Hành chính & Tài chính\n\n## Thẩm quyền phê duyệt\n| Giá trị đơn hàng | Người phê duyệt |\n|--------------",
+        "[Nguồn: chi_phi_expense.md]\n# Quy trình chi phí và hoàn ứng\n> Phiên bản: 1.3 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Tài chính\n\n## Thời hạn nộp hồ sơ\nNhân viên phải nộp hồ sơ hoàn ứng chi phí trong v",
+        "[Nguồn: tam_ung.md]\n# Chính sách tạm ứng\n> Phiên bản: 1.0 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Tài chính\n\n## Hạn mức tạm ứng\nNhân viên có thể tạm ứng tối đa **20.000.000 VNĐ** cho mỗi lần đề xuất."
+      ]
+    }
+  ]
+}

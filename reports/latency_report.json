@@ -1,0 +1,182 @@
+{
+  "per_query_avg_ms": {
+    "retrieval_ms": 473.6,
+    "rerank_ms": 16829.8,
+    "generation_ms": 1436.0,
+    "total_ms": 18739.5
+  },
+  "per_query_p95_ms": {
+    "retrieval_ms": 925.7,
+    "rerank_ms": 24958.6,
+    "generation_ms": 2842.8,
+    "total_ms": 28418.1
+  },
+  "build_seconds": {
+    "chunking": 0.1,
+    "enrichment": 59.6,
+    "indexing": 75.7,
+    "reranker_load": 11.5
+  },
+  "queries": [
+    {
+      "query": "Nhân viên được nghỉ bao nhiêu ngày khi kết hôn?",
+      "retrieval_ms": 925.7,
+      "rerank_ms": 7165.5,
+      "generation_ms": 1737.1,
+      "total_ms": 9828.3,
+      "n_contexts": 4
+    },
+    {
+      "query": "Bảo hiểm sức khỏe PVI có hạn mức bao nhiêu cho nhân viên?",
+      "retrieval_ms": 613.7,
+      "rerank_ms": 5389.2,
+      "generation_ms": 1014.5,
+      "total_ms": 7017.4,
+      "n_contexts": 4
+    },
+    {
+      "query": "Phụ cấp ăn trưa hàng tháng là bao nhiêu?",
+      "retrieval_ms": 185.9,
+      "rerank_ms": 5384.0,
+      "generation_ms": 870.9,
+      "total_ms": 6440.9,
+      "n_contexts": 4
+    },
+    {
+      "query": "Nhân viên được nghỉ bao nhiêu ngày phép năm?",
+      "retrieval_ms": 164.1,
+      "rerank_ms": 23040.0,
+      "generation_ms": 1296.9,
+      "total_ms": 24500.9,
+      "n_contexts": 4
+    },
+    {
+      "query": "Thâm niên bao nhiêu năm thì được cộng thêm ngày phép?",
+      "retrieval_ms": 663.3,
+      "rerank_ms": 24517.9,
+      "generation_ms": 1468.1,
+      "total_ms": 26649.2,
+      "n_contexts": 4
+    },
+    {
+      "query": "Mật khẩu phải có tối thiểu bao nhiêu ký tự?",
+      "retrieval_ms": 473.1,
+      "rerank_ms": 23268.5,
+      "generation_ms": 824.1,
+      "total_ms": 24565.6,
+      "n_contexts": 4
+    },
+    {
+      "query": "Bao lâu phải đổi mật khẩu một lần?",
+      "retrieval_ms": 458.2,
+      "rerank_ms": 21905.5,
+      "generation_ms": 847.9,
+      "total_ms": 23211.5,
+      "n_contexts": 4
+    },
+    {
+      "query": "Có cần kích hoạt xác thực đa yếu tố (MFA) không?",
+      "retrieval_ms": 597.2,
+      "rerank_ms": 13614.7,
+      "generation_ms": 1358.4,
+      "total_ms": 15570.3,
+      "n_contexts": 4
+    },
+    {
+      "query": "Nhân viên thử việc có được nghỉ phép năm không?",
+      "retrieval_ms": 298.5,
+      "rerank_ms": 5026.5,
+      "generation_ms": 1255.9,
+      "total_ms": 6580.9,
+      "n_contexts": 4
+    },
+    {
+      "query": "Khi phát hiện malware trên máy, nhân viên có nên tự xử lý không?",
+      "retrieval_ms": 474.9,
+      "rerank_ms": 6709.7,
+      "generation_ms": 1352.7,
+      "total_ms": 8537.4,
+      "n_contexts": 4
+    },
+    {
+      "query": "Nhân viên thử việc có được hưởng bảo hiểm sức khỏe PVI không?",
+      "retrieval_ms": 211.2,
+      "rerank_ms": 19938.3,
+      "generation_ms": 1371.5,
+      "total_ms": 21521.1,
+      "n_contexts": 4
+    },
+    {
+      "query": "Một nhân viên Senior có 9 năm thâm niên được nghỉ bao nhiêu ngày phép năm và lương trong khoảng nào?",
+      "retrieval_ms": 557.3,
+      "rerank_ms": 21645.4,
+      "generation_ms": 1661.7,
+      "total_ms": 23864.3,
+      "n_contexts": 4
+    },
+    {
+      "query": "Nếu cần mua một chiếc laptop 30 triệu cho nhân viên mới, ai phê duyệt và cần gì từ phòng CNTT?",
+      "retrieval_ms": 616.7,
+      "rerank_ms": 24958.6,
+      "generation_ms": 2842.8,
+      "total_ms": 28418.1,
+      "n_contexts": 4
+    },
+    {
+      "query": "Nhân viên được tài trợ khóa học 25 triệu, nghỉ việc sau 8 tháng hoàn thành khóa học. Phải hoàn trả bao nhiêu?",
+      "retrieval_ms": 616.4,
+      "rerank_ms": 23390.2,
+      "generation_ms": 1400.9,
+      "total_ms": 25407.5,
+      "n_contexts": 4
+    },
+    {
+      "query": "Mentor và buddy của nhân viên mới có thể là cùng một người không? Quản lý trực tiếp có thể làm mentor không?",
+      "retrieval_ms": 569.6,
+      "rerank_ms": 23421.4,
+      "generation_ms": 2009.0,
+      "total_ms": 26000.0,
+      "n_contexts": 4
+    },
+    {
+      "query": "Muốn mua thiết bị trị giá 55 triệu cần ai phê duyệt?",
+      "retrieval_ms": 431.0,
+      "rerank_ms": 21674.1,
+      "generation_ms": 1285.2,
+      "total_ms": 23390.2,
+      "n_contexts": 4
+    },
+    {
+      "query": "Nhân viên tạm ứng 15 triệu, sau 20 ngày mới thanh toán. Bị phạt bao nhiêu?",
+      "retrieval_ms": 514.4,
+      "rerank_ms": 23342.7,
+      "generation_ms": 2333.8,
+      "total_ms": 26190.9,
+      "n_contexts": 4
+    },
+    {
+      "query": "Lương thử việc của nhân viên Junior mức cao nhất là bao nhiêu?",
+      "retrieval_ms": 423.4,
+      "rerank_ms": 22586.9,
+      "generation_ms": 1289.9,
+      "total_ms": 24300.3,
+      "n_contexts": 4
+    },
+    {
+      "query": "Thông tin lương thuộc cấp độ phân loại dữ liệu nào?",
+      "retrieval_ms": 491.5,
+      "rerank_ms": 15091.2,
+      "generation_ms": 1346.8,
+      "total_ms": 16929.5,
+      "n_contexts": 4
+    },
+    {
+      "query": "Nghỉ phép không lương 20 ngày cần ai phê duyệt?",
+      "retrieval_ms": 186.8,
+      "rerank_ms": 4526.3,
+      "generation_ms": 1152.5,
+      "total_ms": 5865.6,
+      "n_contexts": 4
+    }
+  ]
+}
