@@ -27,7 +27,8 @@ SEMANTIC_THRESHOLD = 0.85
 BM25_TOP_K = 20
 DENSE_TOP_K = 20
 HYBRID_TOP_K = 20
-RERANK_TOP_K = 3
+RERANK_TOP_K = 10         # top-20 hybrid -> top-10 child (nhieu child cung 1 parent nen phai lay du)
+MAX_CONTEXTS = 4          # số context (parent) tối đa đưa vào prompt LLM
 
 # --- Paths ---
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")

@@ -34,9 +34,11 @@ def main():
     prod_results = evaluate_pipeline(search, reranker)
 
     # Move reports to reports/
+    # os.replace() thay vì os.rename(): trên Windows rename() ném FileExistsError
+    # khi file đích đã tồn tại (lần chạy trước), POSIX thì ghi đè im lặng.
     for f in ["ragas_report.json", "naive_baseline_report.json"]:
         if os.path.exists(f):
-            os.rename(f, f"reports/{f}")
+            os.replace(f, os.path.join("reports", f))
 
     # Step 3: Comparison
     print("\n📌 STEP 3: Comparison")
