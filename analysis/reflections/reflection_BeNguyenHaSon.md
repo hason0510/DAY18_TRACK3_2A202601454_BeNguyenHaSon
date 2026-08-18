@@ -115,13 +115,13 @@ Nguyên nhân: SDK OpenAI mặc định `timeout=600s`. Một request treo, cu�
 - `ragas 0.1.22`: default LLM vẫn trỏ `gpt-3.5-turbo-16k` (OpenAI đã ngừng phục vụ) → phải truyền tường minh `llm=ChatOpenAI("gpt-4o-mini")` và `embeddings=OpenAIEmbeddings(...)`.
 - PDF: `pypdf` trả **0 ký tự** cho `Nghi_dinh_13-2023.pdf`, `PyMuPDF` trả **38 ký tự** — nhưng 38 ký tự đó chỉ là dòng metadata "Cơ quan phát hành: Văn phòng Chính phủ", không phải 39 trang nội dung. Nếu chỉ kiểm tra `if text:` thì file rác này lọt vào index thành một parent vô nghĩa. Phải đặt ngưỡng `MIN_PDF_TEXT_CHARS = 200`.
 
+
+
 ---
 
 ## Phần 3 — Action Plan cho project cá nhân
 
-> **Cần điền:** thay `[TÊN PROJECT]` và mục "Hiện tại" bằng thông tin dự án thật của tôi. Phần "Plan áp dụng" bên dưới đã viết theo đúng kết luận đo được từ lab này.
-
-### Project: [TÊN PROJECT] — trợ lý hỏi đáp tài liệu nội bộ tiếng Việt
+### Project: ChillGuys — trợ lý hỏi đáp tài liệu nội bộ tiếng Việt
 
 **Hiện tại**
 - RAG pipeline: chunking cố định theo số ký tự + dense-only search + top-k thô, không rerank, không đánh giá tự động.
@@ -148,7 +148,7 @@ Nguyên nhân: SDK OpenAI mặc định `timeout=600s`. Một request treo, cu�
 
 | Tuần | Việc | Tiêu chí xong |
 |---|---|---|
-| Tuần 1 | Dựng bộ đánh giá trước, không code pipeline: 50–100 cặp Q&A từ ticket thật, chia train/held-out, dựng `evaluate_ragas()` + audit metric trên tiếng Việt | Có baseline số của hệ thống hiện tại; biết chắc metric không bị artifact ngôn ngữ |
+| Tuần 1 | Dựng bộ đánh giá trước, không code pipeline: 50–100 cặp Q&A từ ticket thật, chia train/held-out, dựng `evaluate_ragas()` + audit metric trên tiếng Việt, **chạy baseline 3 lần để đo biên nhiễu** | Có baseline số của hệ thống hiện tại; biết chắc metric không bị artifact ngôn ngữ; **có ngưỡng "Δ bao nhiêu thì mới là thật"** |
 | Tuần 2 | Đo phân bố độ dài tài liệu → chọn tham số → hierarchical chunking + parent expansion; thêm hybrid BM25+RRF | `context_recall` tăng so với baseline tuần 1 |
 | Tuần 3 | Enrichment (contextual + version metadata) + lọc bản superseded; thêm reranking kèm đo latency từng bước | `context_precision` tăng; có bảng latency để quyết định giữ hay bỏ rerank |
 | Tuần 4 | Tối ưu prompt sinh answer trên tập train, **đánh giá cuối trên held-out**; viết failure analysis; chốt cấu hình | Chênh lệch điểm train vs held-out < 0.05 (nếu lớn hơn nghĩa là đã overfit prompt) |
@@ -162,4 +162,4 @@ Nguyên nhân: SDK OpenAI mặc định `timeout=600s`. Một request treo, cu�
 | Hiểu bài giảng | 4 | Nắm được vì sao RRF không cần normalize và vì sao cross-encoder chỉ dùng ở tầng rerank — có số liệu tự đo để chứng minh |
 | Code quality | 4 | 0 TODO còn lại, mọi nhánh lỗi đều có fallback; trừ điểm vì `except Exception` quá rộng ở M4 đã che mất bug `adapt()` gần một tiếng |
 | Problem solving | 4 | Truy được ba lỗi mà không có thông báo rõ ràng: `adapt()` hỏng cache, artifact ngôn ngữ của metric, và query treo 176s làm answer thành context |
-| Trung thực học thuật | 4 | Tự phát hiện và sửa rò rỉ test set vào prompt, khai báo đầy đủ 3 thay đổi phương pháp trong `failure_analysis.md` mục 8 |
+| Trung thực học thuật | 4 | Tự phát hiện và sửa rò rỉ test set vào prompt; khai báo đầy đủ 4 thay đổi phương pháp ở `failure_analysis.md` mục 9; và giữ lại nguyên vẹn report của lần chạy thất bại (mục 8) thay vì lặng lẽ chọn con số đẹp hơn |

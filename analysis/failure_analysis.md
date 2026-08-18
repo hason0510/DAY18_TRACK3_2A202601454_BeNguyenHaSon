@@ -35,7 +35,7 @@ Corpus: **26 tài liệu** (25 `.md` + `so_tay_an_toan.pdf`) → **114 child chu
 
 Hai điểm cần đọc kỹ trong bảng này:
 
-- **`faithfulness` gần như đứng yên (+0.0009).** Toàn bộ điểm mất của production nằm ở 3 câu numeric multi-hop (mục 3, #1/#2/#5) — không phải lỗi retrieval mà là lỗi tầng generation (làm phép tính, thuật lại dữ kiện câu hỏi). Hybrid + rerank không sửa được nhóm lỗi này, nên việc nó không nhích lên là hợp lý chứ không phải dấu hiệu pipeline vô dụng.
+- **`faithfulness` gần như đứng yên (+0.0009).** Toàn bộ điểm mất của production nằm ở 3 câu numeric multi-hop (mục 3, #1/#2/#5) — không phải lỗi retrieval mà là lỗi tầng generation (làm phép tính, thuật lại dữ kiện câu hỏi). Hybrid + rerank không sửa được nhóm lỗi này, nên việc nó không nhích lên là hợp lý chứ không phải dấu hiệu pipeline vô dụng. **Lưu ý quan trọng:** +0.0009 nhỏ hơn biên nhiễu giữa hai lần chạy (~0.03 cho faithfulness) nên không được đọc là "production hơn baseline một chút" — đúng hơn là "hai hệ thống không phân biệt được ở metric này". Bằng chứng đo được ở mục 8.
 - **`context_precision` giảm 0.029 là đánh đổi có chủ ý.** Baseline đưa 3 chunk nhỏ, production đưa tới 4 parent (mỗi parent ≈ cả một tài liệu). Nhiều thông tin hơn → recall tăng 0.05 nhưng tỉ lệ câu thừa trong context cũng tăng. Với bộ câu hỏi multi-hop thì đổi 0.03 precision lấy 0.05 recall là có lợi: thiếu context thì LLM không trả lời được, còn thừa context thì LLM vẫn lọc được.
 
 ---
@@ -191,13 +191,57 @@ Xếp theo tỉ lệ điểm-thu-được / công-bỏ-ra, dựa trên bottom-5 
 2. **Query decomposition cho câu hỏi nhiều ý** — sửa trực tiếp #4 (`context_recall` 0.5 vì `bang_luong_2024.md` không lọt top khi query hỏi cả phép năm lẫn lương). Tách sub-query, retrieve riêng, đảm bảo mỗi ý có tối thiểu 1 context, rồi mới hợp nhất. Đây là lỗi retrieval đắt nhất còn lại.
 3. **Version-aware metadata** — sửa `context_precision` = 0.5 ở "Nhân viên được nghỉ bao nhiêu ngày phép năm?" và "Thâm niên bao nhiêu năm…", 0.75 ở "Muốn mua thiết bị 55 triệu…", đồng thời sửa `context_recall` = 0.5 ở #3 (MFA). Enrichment đã gọi LLM cho từng chunk rồi, chỉ cần thêm 2 trường `version` + `effective_date` vào JSON trả về → chi phí gần bằng 0. Lưu ý bài học từ #3: **gắn nhãn** phiên bản chứ không loại thẳng bản cũ.
 4. **Giảm latency rerank** — 89,8% tổng thời gian là không chấp nhận được cho production. `max_length=512` cho CrossEncoder, chuyển GPU, hoặc bỏ rerank khi RRF đã tách bạch top-1/top-2.
+5. **Cache enrichment xuống đĩa theo hash nội dung chunk** — hiện mỗi lần build lại gọi LLM sinh lại summary/HyQA/context-line, nên embedding khác đi và thứ tự retrieve đổi theo: index của production **không tất định** (đo được ở mục 8 — baseline giữ nguyên `context_precision`/`recall` tới từng chữ số qua 2 lần chạy, còn production thì không). Cache vừa làm build tái lập được, vừa cắt 50 giây và toàn bộ chi phí API mỗi lần chạy lại.
 
 ---
 
-## 8. Khai báo phương pháp
+## 8. Thực nghiệm bổ sung: siết prompt hai phần — cơ chế đúng, tổng thể không cải thiện
+
+Sau khi viết xong mục 3, tôi thử đúng suggested_fix của #1 và #5: đổi quy tắc 8 từ lời khuyên ("đừng thuật lại tình huống") thành **khuôn bắt buộc hai phần** (câu đầu trích nguyên văn quy định từ context, câu sau mới là kết quả áp dụng), và thêm vào quy tắc 3 yêu cầu tự tính lại rồi đối chiếu trước khi kết luận. Chạy lại toàn bộ pipeline. Report của lần chạy này lưu ở `reports/ablation_prompt_2phan/`.
+
+**Cơ chế hoạt động đúng như dự đoán.** Câu tạm ứng (#1) đổi từ
+
+> "Nhân viên tạm ứng 15 triệu VNĐ và thanh toán sau 20 ngày sẽ bị phạt 2%/tháng…" *(mở đầu bằng dữ kiện của người hỏi)*
+
+thành
+
+> "Theo Chính sách tạm ứng, khoản tạm ứng chưa thanh toán sau 15 ngày sẽ bị tính phí **2%/tháng** trên số tiền chưa hoàn ứng. Do đó mức phạt là…"
+
+và faithfulness của riêng câu đó tăng **0.1111 → 0.3333**.
+
+**Nhưng hai điều làm thực nghiệm thất bại.**
+
+1. *Phép tính vẫn sai, chỉ sai kiểu khác*: lần này ra **600.000 VNĐ** thay vì 500.000 — đáp án đúng vẫn là 50.000. Lệnh "tự tính lại và đối chiếu" không cứu được `gpt-4o-mini`. Điều này **xác nhận** suggested_fix ở mục 7.1: phép tính phải ra khỏi LLM, không vá được bằng prompt.
+2. *Điểm tổng giảm*, và quan trọng hơn — **mức giảm nằm trong biên nhiễu giữa hai lần chạy**:
+
+| Metric | Baseline run 1 | Baseline run 2 | Δ baseline | Production run 1 | Production run 2 | Δ production |
+|---|---|---|---|---|---|---|
+| Faithfulness | 0.8405 | 0.8333 | −0.0072 | 0.8414 | 0.8125 | −0.0289 |
+| Answer Relevancy | 0.7821 | 0.7013 | **−0.0808** | 0.8597 | 0.8393 | −0.0204 |
+| Context Precision | 0.9250 | 0.9250 | **0.0000** | 0.8958 | 0.8792 | −0.0166 |
+| Context Recall | 0.9000 | 0.9000 | **0.0000** | 0.9500 | 0.9250 | −0.0250 |
+
+**Cột "Δ baseline" là cột đáng đọc nhất trong cả báo cáo này.** Baseline không đổi một dòng code nào giữa hai lần chạy, vậy mà:
+
+- `answer_relevancy` xê dịch **0.081** — **lớn hơn** chính con số Δ = +0.0776 mà mục 2 đang dùng để chứng minh production tốt hơn baseline;
+- `faithfulness` xê dịch 0.007 — cùng bậc với Δ = +0.0009 ở mục 2, tức con số đó **hoàn toàn vô nghĩa**;
+- nhưng `context_precision` và `context_recall` **giống hệt nhau tới từng chữ số**.
+
+Hai loại metric ứng xử khác hẳn nhau, và lý do rất cụ thể: `context_precision`/`context_recall` chỉ phụ thuộc câu hỏi, context và ground truth — với baseline thì dense retrieval là **tất định**, nên chấm lại cho đúng con số cũ. Còn `faithfulness`/`answer_relevancy` phụ thuộc câu trả lời do LLM sinh (temperature > 0) rồi lại được một LLM khác chấm — hai tầng ngẫu nhiên chồng lên nhau.
+
+Điều đó cũng giải thích vì sao **production lại xê dịch cả context_precision/recall trong khi baseline thì không**: pipeline production gọi LLM để enrichment ở mỗi lần build, nên summary/HyQA/context-line sinh ra khác nhau → embedding khác → **thứ tự retrieve khác**. Nói cách khác, index của production tự nó đã không tất định. Đây là lỗi thiết kế thật của tôi, không phải đặc tính của kiến trúc: enrichment nên được **cache xuống đĩa theo hash nội dung chunk**, vừa làm build tái lập được, vừa tiết kiệm ~50 giây và toàn bộ chi phí API cho mỗi lần chạy lại.
+
+**Quyết định:** revert prompt về đúng bản đã sinh ra số liệu ở mục 2, nộp kết quả run 1, giữ report run 2 lại làm bằng chứng. Lý do không phải "run 1 điểm cao hơn" mà là: với n = 20 câu và một LLM làm giám khảo, tôi **không có đủ dữ liệu để kết luận** bản prompt nào tốt hơn — mà giữa hai thứ không phân biệt được thì chọn bản đã được phân tích kỹ trong mục 3.
+
+**Hệ quả cho cách đọc mục 2:** trong 4 con số Δ, chỉ `context_recall` (+0.0500) là vượt rõ biên nhiễu; `answer_relevancy` (+0.0776) nằm sát biên; `faithfulness` (+0.0009) và `context_precision` (−0.0292) thì **không kết luận được gì**. Muốn khẳng định chắc chắn thì phải chạy mỗi cấu hình 5 lần rồi báo mean ± std, hoặc nâng test set lên 100+ câu — đây là việc đầu tiên tôi sẽ làm cho ChillGuys (xem reflection, Phần 3, Tuần 1).
+
+---
+
+## 9. Khai báo phương pháp
 
 Ba điều người chấm nên biết để đánh giá đúng con số:
 
 1. **`RERANK_TOP_K` đổi 3 → 10**, khác với "top-20 → top-3" mô tả trong ASSIGNMENT. Lý do: mỗi file corpus chỉ ~800 ký tự nên `parent_size=2048` khiến **1 document = 1 parent**; top-3 child thường trỏ về cùng một parent, sau dedupe chỉ còn **1 context duy nhất** — câu multi-hop cần dữ kiện từ 2 file sẽ hỏng. Đã kiểm chứng bằng test offline trước khi đổi.
 2. **`answer_relevancy` dùng prompt tiếng Việt viết tay** thay cho prompt tiếng Anh gốc của RAGAS, **áp dụng cho cả baseline lẫn production** trong lần chạy này. Chi tiết, bằng chứng và cách tắt: mục 4.
 3. **Prompt được tinh chỉnh sau khi đọc failure trên chính 20 câu dùng để chấm** — không có held-out set. Đây là quy trình mà lab yêu cầu (failure analysis → suggested_fix → sửa), nhưng đồng nghĩa điểm số có phần lạc quan so với dữ liệu chưa từng thấy.
+4. **Số liệu nộp là của một lần chạy duy nhất (run 1), không phải trung bình nhiều lần.** Tôi có chạy lần thứ hai với một bản prompt khác và đã khai báo đầy đủ ở mục 8, kèm report gốc trong `reports/ablation_prompt_2phan/`. Biên nhiễu đo được giữa hai lần chạy là ~0.08 cho `answer_relevancy` và ~0.03 cho `faithfulness` — cần đọc mọi Δ trong báo cáo này với sai số đó trong đầu.

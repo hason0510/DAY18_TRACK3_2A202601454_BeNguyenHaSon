@@ -72,16 +72,23 @@ Rerank một mình chiếm gần 90% và đắt gấp ~35 lần retrieval → c�
 
 4. **Sau khi vá metric, lỗi còn lại là lỗi thật.** Bottom-5 lần chạy cuối: 3 câu hỏng ở tầng **generation** với bài toán numeric multi-hop (thuật lại dữ kiện đề bài → mất faithfulness; và một câu **tính sai** — 500.000 thay vì 50.000 VNĐ), 2 câu hỏng ở tầng **retrieval** (câu hỏi hai ý chỉ lấy được context cho một ý; câu hỏi về MFA thiếu tài liệu phiên bản cũ). Không câu nào hỏng vì chunking hay fusion.
 
+5. **Điều tôi tin chắc nhất lại là điều đo được ít chắc chắn nhất — biên nhiễu lớn hơn cải thiện.**
+   Tôi chạy pipeline lần thứ hai với một bản prompt siết chặt hơn. Kết quả: **baseline không đổi một dòng code nào** mà `answer_relevancy` xê dịch **0.081** — lớn hơn chính con số Δ = +0.0776 đang dùng để chứng minh production hơn baseline; `faithfulness` xê dịch 0.007, cùng bậc với Δ = +0.0009. Nhưng `context_precision`/`context_recall` của baseline thì **giống hệt tới từng chữ số** qua cả hai lần.
+   Lý do rất cụ thể: hai metric sau chỉ phụ thuộc context (dense retrieval của baseline là tất định), hai metric trước phụ thuộc câu trả lời do LLM sinh rồi lại được LLM khác chấm — hai tầng ngẫu nhiên chồng nhau. Hệ quả: trong 4 con số Δ ở bảng trên, chỉ `context_recall` (+0.05) là vượt rõ biên nhiễu.
+   Riêng production thì `context_precision`/`recall` **cũng** xê dịch, và đó là lỗi thiết kế của tôi: enrichment gọi LLM lại ở mỗi lần build nên index tự nó không tất định — phải cache theo hash nội dung chunk. Chi tiết + số liệu: `failure_analysis.md` mục 8, report gốc lưu ở `reports/ablation_prompt_2phan/`.
+
 ## Presentation Notes (5 phút)
 
 1. **RAGAS naive vs production** — bảng trên; nhấn vào Δ answer_relevancy +0,078 và recall +0,05, và giải thích vì sao faithfulness gần như đứng yên (lỗi còn lại nằm ở phép tính, hybrid+rerank không sửa được).
 2. **Biggest win** — M1 hierarchical + parent expansion cho recall, nhưng phần lớn điểm số đến từ prompt engineering ở tầng generation. Thông điệp: retrieval tốt là điều kiện cần, không phải điều kiện đủ.
 3. **Case study — metric cũng là một hệ thống có bug.** Câu "Khi phát hiện malware, nhân viên có nên tự xử lý không?": Output đúng? → ĐÚNG. Context? → precision 1,0 recall 1,0. Faithfulness? → 1,0. Vậy mà answer_relevancy = **0,0** tròn trịa → dấu hiệu của cờ nhị phân chứ không phải cosine → truy ra `noncommittal = 1` do judge hiểu nhầm câu phủ định là né tránh. Sau khi vá prompt tiếng Việt, câu này **rớt hẳn khỏi bottom-10**.
 4. **Con số gây sốc nhất — rerank chiếm 89,8% latency**, 16,8 giây/query trên CPU, gấp ~35 lần retrieval. Đây là lý do kiến trúc phải là *retrieve rộng bằng bi-encoder → rerank hẹp bằng cross-encoder*, và là thứ đầu tiên phải tối ưu nếu đưa lên production.
-5. **Nếu có thêm 1 giờ** — (a) tách phép tính khỏi LLM (lỗi duy nhất khiến hệ thống trả **sai** cho người dùng); (b) query decomposition cho câu hỏi nhiều ý; (c) version-aware metadata.
+5. **Điều muốn người nghe nhớ nhất** — tôi chạy lại y hệt baseline và nó lệch 0.08 điểm. Trước khi khoe một cải tiến +0.05, hãy đo xem hệ thống của bạn tự dao động bao nhiêu. Không có con số đó thì mọi Δ đều là kể chuyện.
+6. **Nếu có thêm 1 giờ** — (a) tách phép tính khỏi LLM (lỗi duy nhất khiến hệ thống trả **sai** cho người dùng); (b) query decomposition cho câu hỏi nhiều ý; (c) version-aware metadata; (d) cache enrichment để build tái lập được.
 
 ## Khai báo phương pháp
 
 1. `RERANK_TOP_K` đổi 3 → 10 (ASSIGNMENT ghi "top-20 → top-3"). Lý do: mỗi file ~800 ký tự nên 1 document = 1 parent, top-3 child thường trỏ về cùng một parent, dedupe xong chỉ còn 1 context.
 2. `answer_relevancy` dùng prompt tiếng Việt viết tay thay prompt tiếng Anh gốc, **áp dụng cho cả baseline lẫn production** — bằng chứng ở `failure_analysis.md` mục 4, tắt được bằng `RAGAS_ADAPT_LANGUAGE = None`.
 3. Prompt sinh answer được tinh chỉnh sau khi đọc failure trên chính 20 câu dùng để chấm — không có held-out set.
+4. Số liệu nộp là của **một lần chạy** (run 1), không phải trung bình nhiều lần. Lần chạy thứ hai với prompt khác đã được khai báo đầy đủ ở `failure_analysis.md` mục 8, report gốc giữ nguyên trong `reports/ablation_prompt_2phan/`. Biên nhiễu đo được: ~0.08 (`answer_relevancy`), ~0.03 (`faithfulness`).
